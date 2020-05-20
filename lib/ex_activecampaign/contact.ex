@@ -23,6 +23,17 @@ defmodule ExActivecampaign.Contact do
     |> handle_response
   end
 
+  @doc """
+    Creates or Updates a Contact on the ActiveCampaign system
+
+    ## Examples
+
+      iex> ExActivecampaign.Contact.create_or_update(%{contact: %{email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"}})
+      %{contact: %{email: "johndoe@example.com", firstName: "John", id: 1, lastName: "Doe", phone: "7223224241"}}
+
+      iex> ExActivecampaign.Contact.create_or_update(%{contact: %{email: "1234"}})
+      %{error_message: "Unprocessable Entity"}
+  """
   def create_or_update(params) do
     Api.post(Api.base_url() <> "/contact/sync", params, headers())
     |> handle_response

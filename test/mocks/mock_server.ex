@@ -26,7 +26,13 @@ defmodule ExActivecampaign.MockServer do
     |> Plug.Conn.send_resp(
       200,
       Poison.encode!(%{
-        contact: %{id: conn.params["id"], email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"},
+        contact: %{
+          id: conn.params["id"],
+          email: "johndoe@example.com",
+          firstName: "John",
+          lastName: "Doe",
+          phone: "7223224241"
+        },
         contactLists: []
       })
     )
@@ -40,7 +46,33 @@ defmodule ExActivecampaign.MockServer do
   post "/contacts" do
     case conn.params do
       %{"contact" => %{"email" => "johndoe@example.com"}} ->
-        contacts_post_success(conn, %{"contact" => %{"id" => 1, "email" => "johndoe@example.com", "firstName" => "John", "lastName" => "Doe", "phone" => "7223224241"}})
+        contacts_post_success(conn, %{
+          "contact" => %{
+            "id" => 1,
+            "email" => "johndoe@example.com",
+            "firstName" => "John",
+            "lastName" => "Doe",
+            "phone" => "7223224241"
+          }
+        })
+
+      %{"contact" => %{"email" => "1234"}} ->
+        contacts_post_failure_malformed_email(conn)
+    end
+  end
+
+  post "/contact/sync" do
+    case conn.params do
+      %{"contact" => %{"email" => "johndoe@example.com"}} ->
+        contacts_post_success(conn, %{
+          "contact" => %{
+            "id" => 1,
+            "email" => "johndoe@example.com",
+            "firstName" => "John",
+            "lastName" => "Doe",
+            "phone" => "7223224241"
+          }
+        })
 
       %{"contact" => %{"email" => "1234"}} ->
         contacts_post_failure_malformed_email(conn)

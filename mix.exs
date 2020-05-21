@@ -4,7 +4,7 @@ defmodule ExActivecampaign.MixProject do
   def project do
     [
       app: :ex_activecampaign,
-      version: "0.1.2",
+      version: "0.1.3",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -31,8 +31,8 @@ defmodule ExActivecampaign.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
-      {:poison, "~> 3.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:poison, "~> 4.0"},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:plug_cowboy, "~> 2.0", only: [:test]}
     ]
   end

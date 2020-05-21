@@ -32,7 +32,7 @@ defmodule ExActivecampaign.MixProject do
     [
       {:httpoison, "~> 0.13.0"},
       {:poison, "~> 3.1"},
-      {:ex_doc, ">= 0.0.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:plug_cowboy, "~> 2.0", only: [:test]}
     ]
   end

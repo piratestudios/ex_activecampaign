@@ -103,6 +103,9 @@ defmodule ExActivecampaign.Api do
       iex> ExActivecampaign.Api.encode(%{a: 1}, "application/json")
       "{\\"a\\":1}"
 
+      iex> ExActivecampaign.Api.encode(nil, "application/json")
+      ""
+
       iex> ExActivecampaign.Api.encode("<xml/>", "application/xml")
       "<xml/>"
 
@@ -112,6 +115,7 @@ defmodule ExActivecampaign.Api do
       iex> ExActivecampaign.Api.encode("goop", "application/stuff")
       "goop"
   """
+  def encode(nil, "application/json"), do: ""
   def encode(data, "application/json"), do: Poison.encode!(data)
   def encode(data, "application/xml"), do: data
   def encode(data, "application/x-www-form-urlencoded"), do: URI.encode_query(data)

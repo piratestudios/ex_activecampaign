@@ -30,7 +30,7 @@ defmodule ExActivecampaign.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 0.13.0"},
+      {:httpoison, "~> 1.0"},
       {:poison, "~> 3.1"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:plug_cowboy, "~> 2.0", only: [:test]}

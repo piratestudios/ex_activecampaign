@@ -50,7 +50,7 @@ Then, create a `config/#{environment_name}.exs` file for each environment. You c
 
 To use the middleware, simply add a call to the desired API method in the relevant part of the dependent codebase, e.g.:
 
-```
+```elixir
 def subscribe_to_mailing_list(email, first_name, last_name, phone) do
     %{contact: %{id: id}} = ExActivecampaign.Contact.create_or_update(
         %{email: email, first_name: first_name, last_name: last_name, phone: phone}

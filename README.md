@@ -51,8 +51,13 @@ Then, create a `config/#{environment_name}.exs` file for each environment. You c
 To use the middleware, simply add a call to the desired API method in the relevant part of the dependent codebase, e.g.:
 
 ```
-def email_signup(email, first_name, last_name, phone) do
-    ExActivecampaign.Contact.create(%{contact: %{email: email, firstName: first_name, lastName: last_name, phone: phone}})
+def subscribe_to_mailing_list(email, first_name, last_name, phone) do
+    %{contact: %{id: id}} = ExActivecampaign.Contact.create_or_update(
+        %{email: email, first_name: first_name, last_name: last_name, phone: phone}
+    )
+    ExActivecampaign.Contact.update_list_status(
+        %{contact: id, list: 1, status: 1}
+    )
 end
 ```
 

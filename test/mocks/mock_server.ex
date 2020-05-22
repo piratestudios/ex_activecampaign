@@ -34,10 +34,17 @@ defmodule ExActivecampaign.MockServer do
     |> Plug.Conn.send_resp(404, Poison.encode!(%{message: "Not Found"}))
   end
 
+  get "/contacts" do
+    case conn.params do
+      %{"email" => "johndoe@example.com"} -> contacts_get_success(conn)
+      %{"email" => "some-invalid-email"} -> get_failure_not_found(conn)
+    end
+  end
+
   get "/contacts/:id" do
     case conn.path_params do
       %{"id" => "1"} -> contacts_get_success(conn)
-      %{"id" => "some-invalid-id"} -> get_failure_not_found(conn)
+      %{"id" => "101"} -> get_failure_not_found(conn)
     end
   end
 
@@ -47,7 +54,7 @@ defmodule ExActivecampaign.MockServer do
       200,
       Poison.encode!(%{
         contact: %{
-          id: conn.params["id"],
+          id: "1",
           email: "johndoe@example.com",
           firstName: "John",
           lastName: "Doe",

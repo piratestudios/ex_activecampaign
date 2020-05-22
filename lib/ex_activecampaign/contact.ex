@@ -86,11 +86,21 @@ defmodule ExActivecampaign.Contact do
       iex> ExActivecampaign.Contact.retrieve(1)
       %{contact: %{id: "1", email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"}, contactLists: []}
 
-      iex> ExActivecampaign.Contact.retrieve("some-invalid-id")
+      iex> ExActivecampaign.Contact.retrieve(101)
+      %{error_message: "Not Found"}
+
+      iex> ExActivecampaign.Contact.retrieve("johndoe@example.com")
+      %{contact: %{id: "1", email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"}, contactLists: []}
+
+      iex> ExActivecampaign.Contact.retrieve("some-invalid-email")
       %{error_message: "Not Found"}
   """
-  def retrieve(id) do
+  def retrieve(id) when is_integer(id) do
     Api.get(Api.base_url() <> "/contacts/#{id}", %{}, [])
+    |> Api.handle_response
+  end
+  def retrieve(email) when is_binary(email) do
+    Api.get(Api.base_url() <> "/contacts?email=#{email}", %{}, [])
     |> Api.handle_response
   end
 

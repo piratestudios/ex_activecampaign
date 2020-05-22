@@ -14,10 +14,30 @@ defmodule ExActivecampaign.MockServer do
   plug(:match)
   plug(:dispatch)
 
+  defp post_success_created(conn, body) do
+    conn
+    |> Plug.Conn.send_resp(201, Poison.encode!(body))
+  end
+
+  defp post_failure_bad_request(conn) do
+    conn
+    |> Plug.Conn.send_resp(400, Poison.encode!(%{message: "Bad Request"}))
+  end
+
+  defp post_failure_unprocessable_entity(conn) do
+    conn
+    |> Plug.Conn.send_resp(422, Poison.encode!(%{message: "Unprocessable Entity"}))
+  end
+
+  defp get_failure_not_found(conn) do
+    conn
+    |> Plug.Conn.send_resp(404, Poison.encode!(%{message: "Not Found"}))
+  end
+
   get "/contacts/:id" do
     case conn.path_params do
       %{"id" => "1"} -> contacts_get_success(conn)
-      %{"id" => "some-invalid-id"} -> contacts_get_failure_not_found(conn)
+      %{"id" => "some-invalid-id"} -> get_failure_not_found(conn)
     end
   end
 
@@ -38,15 +58,10 @@ defmodule ExActivecampaign.MockServer do
     )
   end
 
-  defp contacts_get_failure_not_found(conn) do
-    conn
-    |> Plug.Conn.send_resp(404, Poison.encode!(%{message: "Not Found"}))
-  end
-
   post "/contacts" do
     case conn.params do
       %{"contact" => %{"email" => "johndoe@example.com"}} ->
-        contacts_post_success(conn, %{
+        post_success_created(conn, %{
           "contact" => %{
             "id" => "1",
             "email" => "johndoe@example.com",
@@ -57,14 +72,14 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contact" => %{"email" => "1234"}} ->
-        contacts_post_failure_malformed_email(conn)
+        post_failure_unprocessable_entity(conn)
     end
   end
 
   post "/contact/sync" do
     case conn.params do
       %{"contact" => %{"email" => "johndoe@example.com"}} ->
-        contacts_post_success(conn, %{
+        post_success_created(conn, %{
           "contact" => %{
             "id" => "1",
             "email" => "johndoe@example.com",
@@ -75,24 +90,14 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contact" => %{"email" => "1234"}} ->
-        contacts_post_failure_malformed_email(conn)
+        post_failure_unprocessable_entity(conn)
     end
-  end
-
-  defp contacts_post_success(conn, body) do
-    conn
-    |> Plug.Conn.send_resp(201, Poison.encode!(body))
-  end
-
-  defp contacts_post_failure_malformed_email(conn) do
-    conn
-    |> Plug.Conn.send_resp(422, Poison.encode!(%{message: "Unprocessable Entity"}))
   end
 
   post "/contactLists" do
     case conn.params do
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => 1}} ->
-        contact_list_post_success(conn, %{
+        post_success_created(conn, %{
           "contacts" => [
             %{
               "id" => "1",
@@ -110,7 +115,7 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => 0}} ->
-        contact_list_post_success(conn, %{
+        post_success_created(conn, %{
           "contacts" => [
             %{
               "id" => "1",
@@ -128,23 +133,34 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contactList" => %{"list" => "invalid-list", "contact" => 1, "status" => 1}} ->
-        contact_list_post_failure_invalid_param(conn)
+        post_failure_bad_request(conn)
 
       %{"contactList" => %{"list" => 1, "contact" => "invalid-contact", "status" => 1}} ->
-        contact_list_post_failure_invalid_param(conn)
+        post_failure_bad_request(conn)
 
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => "invalid-status"}} ->
-        contact_list_post_failure_invalid_param(conn)
+        post_failure_bad_request(conn)
     end
   end
 
-  defp contact_list_post_success(conn, body) do
-    conn
-    |> Plug.Conn.send_resp(201, Poison.encode!(body))
+  get "/lists/:id" do
+    case conn.path_params do
+      %{"id" => "1"} -> list_get_success(conn)
+      %{"id" => "some-invalid-list-id"} -> get_failure_not_found(conn)
+    end
   end
 
-  defp contact_list_post_failure_invalid_param(conn) do
+  defp list_get_success(conn) do
     conn
-    |> Plug.Conn.send_resp(400, Poison.encode!(%{message: "Bad Request"}))
+    |> Plug.Conn.send_resp(
+         200,
+         Poison.encode!(%{
+           list: %{
+             stringid: "example-list",
+             name: "Example List",
+             id: "1"
+           }
+         })
+       )
   end
 end

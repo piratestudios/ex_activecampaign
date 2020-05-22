@@ -10,7 +10,7 @@ defmodule ExActivecampaign.Api do
   Send a GET request to the ActiveCampaign API
   """
   def get(url, query_params \\ %{}, headers \\ []) do
-    call(url, :get, "", query_params, headers)
+    call(url, :get, nil, query_params, headers)
   end
 
   @doc """
@@ -262,4 +262,16 @@ defmodule ExActivecampaign.Api do
 
   def clean_params(query_params) when query_params == %{}, do: []
   def clean_params(query_params), do: [{:params, query_params}]
+
+  def handle_response({status, body} = _resp) do
+    case status do
+      200 -> body
+      201 -> body
+      400 -> %{error_message: "Bad Request"}
+      403 -> %{error_message: "Forbidden"}
+      404 -> %{error_message: "Not Found"}
+      422 -> %{error_message: "Unprocessable Entity"}
+      500 -> %{error_message: "Internal Server Error"}
+    end
+  end
 end

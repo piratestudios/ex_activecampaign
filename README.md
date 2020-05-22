@@ -1,4 +1,4 @@
-# ex_activecampaign
+# ExActivecampaign
 
 A elixir middleware library for interfacing with the
 [ActiveCampaign API](https://developers.activecampaign.com/reference).
@@ -63,8 +63,9 @@ end
 
 ### Supported Endpoints
 
-Currently only supports requests to the following endpoints of the ActiveCampaign
-[Contacts](https://developers.activecampaign.com/reference#contact) API:
+ExActivecampaign currently supports requests to the following endpoints of the ActiveCampaign API
+
+#### [Contacts](https://developers.activecampaign.com/reference#contact):
 - [Create a contact](https://developers.activecampaign.com/reference#create-contact) -
 `ExActiveCampaign.Contact.create()`
 - [Create or update contact](https://developers.activecampaign.com/reference#create-contact-sync) -
@@ -73,3 +74,7 @@ Currently only supports requests to the following endpoints of the ActiveCampaig
 `ExActiveCampaign.Contact.retrieve()`
 - [Update list status for a contact](https://developers.activecampaign.com/reference#update-list-status-for-contact) -
 `ExActiveCampaign.Contact.update_list_status()`
+
+#### [Lists](https://developers.activecampaign.com/reference#lists):
+- [Retrieve a list](https://developers.activecampaign.com/reference#retrieve-a-list) -
+`ExActiveCampaign.List.retrieve()`

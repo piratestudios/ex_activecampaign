@@ -41,8 +41,8 @@ defmodule ExActivecampaign.Contact do
   def create(
         %{email: _email, first_name: _first_name, last_name: _last_name, phone: _phone} = params
       ) do
-    Api.post(Api.base_url() <> "/contacts", %{contact: params}, headers())
-    |> handle_response
+    Api.post(Api.base_url() <> "/contacts", %{contact: params}, [])
+    |> Api.handle_response
   end
 
   @doc """
@@ -74,8 +74,8 @@ defmodule ExActivecampaign.Contact do
   def create_or_update(
         %{email: _email, first_name: _first_name, last_name: _last_name, phone: _phone} = params
       ) do
-    Api.post(Api.base_url() <> "/contact/sync", %{contact: params}, headers())
-    |> handle_response
+    Api.post(Api.base_url() <> "/contact/sync", %{contact: params}, [])
+    |> Api.handle_response
   end
 
   @doc """
@@ -90,8 +90,8 @@ defmodule ExActivecampaign.Contact do
       %{error_message: "Not Found"}
   """
   def retrieve(id) do
-    Api.get(Api.base_url() <> "/contacts/#{id}", %{}, headers())
-    |> handle_response
+    Api.get(Api.base_url() <> "/contacts/#{id}", %{}, [])
+    |> Api.handle_response
   end
 
   @doc """
@@ -130,24 +130,10 @@ defmodule ExActivecampaign.Contact do
              @list_status_unsubscribed,
              @list_status_bounced
            ] do
-    Api.post(Api.base_url() <> "/contactLists", %{contactList: params}, headers())
-    |> handle_response
+    Api.post(Api.base_url() <> "/contactLists", %{contactList: params}, [])
+    |> Api.handle_response
   end
   def update_list_status(_) do
     %{error_message: "Status must be one of: 0 (unconfirmed), 1 (active), 2 (unsubscribed), 3 (active)"}
   end
-
-  defp handle_response({status, body}) do
-    case status do
-      200 -> body
-      201 -> body
-      400 -> %{error_message: "Bad Request"}
-      403 -> %{error_message: "Forbidden"}
-      404 -> %{error_message: "Not Found"}
-      422 -> %{error_message: "Unprocessable Entity"}
-      500 -> %{error_message: "Internal Server Error"}
-    end
-  end
-
-  defp headers(), do: []
 end

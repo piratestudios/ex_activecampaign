@@ -10,7 +10,7 @@ The package can be installed by adding `ex_activecampaign` to your list of depen
 ```elixir
 def deps do
   [
-    {:ex_activecampaign, git: "git@github.com:piratestudios/ex_activecampaign.git", tag: "0.1.8"}
+    {:ex_activecampaign, github: "piratestudios/ex_activecampaign"}
   ]
 end
 ```

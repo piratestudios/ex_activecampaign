@@ -20,25 +20,25 @@ defmodule ExActivecampaign.Contact do
     Expects a map in the following structure:
     ```
     %{
-      email: "johndoe@example.com",
-      first_name: "John",
-      last_name: "Doe",
-      phone: "7223224241"
+      "email" => "johndoe@example.com",
+      "first_name" => "John",
+      "last_name" => "Doe",
+      "phone" => "7223224241"
     }
     ```
 
     ## Examples
 
-      iex> ExActivecampaign.Contact.create(%{email: "johndoe@example.com", first_name: "John", last_name: "Doe", phone: "7223224241"})
+      iex> ExActivecampaign.Contact.create(%{"email" => "johndoe@example.com", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
       %{contact: %{email: "johndoe@example.com", firstName: "John", id: "1", lastName: "Doe", phone: "7223224241"}}
 
-      iex> ExActivecampaign.Contact.create(%{email: "1234", first_name: "John", last_name: "Doe", phone: "7223224241"})
+      iex> ExActivecampaign.Contact.create(%{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
       %{error_message: "Unprocessable Entity"}
 
-      iex> ExActivecampaign.Contact.create(%{email: "1234"})
+      iex> ExActivecampaign.Contact.create(%{"phone" => "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create/1
   """
-  def create(%{email: _email} = params) do
+  def create(%{"email" => _email} = params) do
     Api.post(Api.base_url() <> "/contacts", %{contact: params}, [])
     |> Api.handle_response
   end
@@ -51,25 +51,25 @@ defmodule ExActivecampaign.Contact do
     Expects a map in the following structure:
     ```
     %{
-      email: "johndoe@example.com",
-      first_name: "John",
-      last_name: "Doe",
-      phone: "7223224241"
+      "email" => "johndoe@example.com",
+      "first_name" => "John",
+      "last_name" => "Doe",
+      "phone" => "7223224241"
     }
     ```
 
     ## Examples
 
-      iex> ExActivecampaign.Contact.create_or_update(%{email: "johndoe@example.com", first_name: "John", last_name: "Doe", phone: "7223224241"})
+      iex> ExActivecampaign.Contact.create_or_update(%{"email" => "johndoe@example.com", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
       %{contact: %{email: "johndoe@example.com", firstName: "John", id: "1", lastName: "Doe", phone: "7223224241"}}
 
-      iex> ExActivecampaign.Contact.create_or_update(%{email: "1234", first_name: "John", last_name: "Doe", phone: "7223224241"})
+      iex> ExActivecampaign.Contact.create_or_update(%{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
       %{error_message: "Unprocessable Entity"}
 
-      iex> ExActivecampaign.Contact.create_or_update(%{email: "1234"})
+      iex> ExActivecampaign.Contact.create_or_update(%{"phone" => "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create_or_update/1
   """
-  def create_or_update(%{email: _email} = params) do
+  def create_or_update(%{"email" => _email} = params) do
     Api.post(Api.base_url() <> "/contact/sync", %{contact: params}, [])
     |> Api.handle_response
   end

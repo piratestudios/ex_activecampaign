@@ -4,7 +4,7 @@ defmodule ExActivecampaign.MixProject do
   def project do
     [
       app: :ex_activecampaign,
-      version: "0.1.7",
+      version: "0.1.8",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,

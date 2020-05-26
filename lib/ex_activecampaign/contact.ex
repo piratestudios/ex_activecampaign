@@ -38,9 +38,7 @@ defmodule ExActivecampaign.Contact do
       iex> ExActivecampaign.Contact.create(%{email: "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create/1
   """
-  def create(
-        %{email: _email, first_name: _first_name, last_name: _last_name, phone: _phone} = params
-      ) do
+  def create(%{email: _email} = params) do
     Api.post(Api.base_url() <> "/contacts", %{contact: params}, [])
     |> Api.handle_response
   end
@@ -71,9 +69,7 @@ defmodule ExActivecampaign.Contact do
       iex> ExActivecampaign.Contact.create_or_update(%{email: "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create_or_update/1
   """
-  def create_or_update(
-        %{email: _email, first_name: _first_name, last_name: _last_name, phone: _phone} = params
-      ) do
+  def create_or_update(%{email: _email} = params) do
     Api.post(Api.base_url() <> "/contact/sync", %{contact: params}, [])
     |> Api.handle_response
   end

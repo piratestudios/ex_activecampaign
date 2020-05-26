@@ -53,7 +53,7 @@ To use the middleware, simply add a call to the desired API method in the releva
 ```elixir
 def subscribe_to_mailing_list(email, first_name, last_name, phone) do
     %{contact: %{id: id}} = ExActivecampaign.Contact.create_or_update(
-        %{email: email, first_name: first_name, last_name: last_name, phone: phone}
+        %{"email" => email, "firstName" => first_name, "lastName" => last_name, "phone" => phone}
     )
     ExActivecampaign.Contact.update_list_status(
         %{contact: id, list: 1, status: 1}

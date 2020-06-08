@@ -157,10 +157,9 @@ defmodule ExActivecampaign.Api do
   end
 
   def decode({ok, body, "application/xml"}) do
-    try do
-      {ok, body |> :binary.bin_to_list() |> :xmerl_scan.string()}
-    catch
+    case decoded_body = body |> :binary.bin_to_list() |> :xmerl_scan.string() do
       :exit, _e -> {:error, body}
+      _ -> {:ok, decoded_body}
     end
   end
 

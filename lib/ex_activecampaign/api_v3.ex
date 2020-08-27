@@ -1,10 +1,9 @@
-defmodule ExActivecampaign.Api do
+defmodule ExActivecampaign.ApiV3 do
   @moduledoc """
-    A wrapper for ActiveCampaign API operations.
+    A wrapper for ActiveCampaign API V3 operations.
   """
 
-  @default_base_url "http://localhost:8081"
-  @default_api_token "DEFAULT-ACTIVECAMPAIGN-TOKEN"
+  alias ExActivecampaign
 
   @doc """
   Send a GET request to the ActiveCampaign API
@@ -16,8 +15,8 @@ defmodule ExActivecampaign.Api do
   @doc """
   Send a POST request to the ActiveCampaign API
   """
-  def post(url, body \\ nil, headers \\ []) do
-    call(url, :post, body, %{}, headers)
+  def post(url, body \\ nil, query_params \\ %{}, headers \\ []) do
+    call(url, :post, body, query_params, headers)
   end
 
   defp call(url, method, body, query_params, headers) do
@@ -39,35 +38,8 @@ defmodule ExActivecampaign.Api do
     |> decode
   end
 
-  @doc """
-  The service's default URL, it will lookup the config,
-  possibly check the env variables and default if still not found
-
-  ## Examples
-
-      iex> ExActivecampaign.Api.base_url()
-      "http://localhost:8081"
-  """
-  def base_url() do
-    Application.get_env(:ex_activecampaign, :base_url)
-    |> case do
-      {:system, lookup} -> System.get_env(lookup)
-      nil -> @default_base_url
-      url -> url
-    end
-  end
-
   defp auth_header() do
-    %{"Api-Token" => api_token()}
-  end
-
-  defp api_token() do
-    Application.get_env(:ex_activecampaign, :api_token)
-    |> case do
-      {:system, lookup} -> System.get_env(lookup)
-      nil -> @default_api_token
-      token -> token
-    end
+    %{"Api-Token" => ExActivecampaign.api_token()}
   end
 
   @doc """
@@ -75,19 +47,19 @@ defmodule ExActivecampaign.Api do
 
   ## Examples
 
-      iex> ExActivecampaign.Api.content_type({:ok, "<xml />", [{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}]})
+      iex> ExActivecampaign.ApiV3.content_type({:ok, "<xml />", [{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}]})
       {:ok, "<xml />", "application/xml"}
 
-      iex> ExActivecampaign.Api.content_type([])
+      iex> ExActivecampaign.ApiV3.content_type([])
       "application/json"
 
-      iex> ExActivecampaign.Api.content_type([{"Content-Type", "plain/text"}])
+      iex> ExActivecampaign.ApiV3.content_type([{"Content-Type", "plain/text"}])
       "plain/text"
 
-      iex> ExActivecampaign.Api.content_type([{"Content-Type", "application/xml; charset=utf-8"}])
+      iex> ExActivecampaign.ApiV3.content_type([{"Content-Type", "application/xml; charset=utf-8"}])
       "application/xml"
 
-      iex> ExActivecampaign.Api.content_type([{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}])
+      iex> ExActivecampaign.ApiV3.content_type([{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}])
       "application/xml"
   """
   def content_type({ok, body, headers}), do: {ok, body, content_type(headers)}
@@ -100,19 +72,19 @@ defmodule ExActivecampaign.Api do
 
   ## Examples
 
-      iex> ExActivecampaign.Api.encode(%{a: 1}, "application/json")
+      iex> ExActivecampaign.ApiV3.encode(%{a: 1}, "application/json")
       "{\\"a\\":1}"
 
-      iex> ExActivecampaign.Api.encode(nil, "application/json")
+      iex> ExActivecampaign.ApiV3.encode(nil, "application/json")
       ""
 
-      iex> ExActivecampaign.Api.encode("<xml/>", "application/xml")
+      iex> ExActivecampaign.ApiV3.encode("<xml/>", "application/xml")
       "<xml/>"
 
-      iex> ExActivecampaign.Api.encode(%{a: "o ne"}, "application/x-www-form-urlencoded")
+      iex> ExActivecampaign.ApiV3.encode(%{a: "o ne"}, "application/x-www-form-urlencoded")
       "a=o+ne"
 
-      iex> ExActivecampaign.Api.encode("goop", "application/stuff")
+      iex> ExActivecampaign.ApiV3.encode("goop", "application/stuff")
       "goop"
   """
   def encode(nil, "application/json"), do: ""
@@ -126,44 +98,46 @@ defmodule ExActivecampaign.Api do
 
   ## Examples
 
-      iex> ExActivecampaign.Api.decode({:ok, "{\\"a\\": 1}", "application/json"})
+      iex> ExActivecampaign.ApiV3.decode({:ok, "{\\"a\\": 1}", "application/json"})
       {:ok, %{a: 1}}
 
-      iex> ExActivecampaign.Api.decode({500, "", "application/json"})
+      iex> ExActivecampaign.ApiV3.decode({500, "", "application/json"})
       {500, ""}
 
-      iex> ExActivecampaign.Api.decode({:error, "{\\"a\\": 1}", "application/json"})
+      iex> ExActivecampaign.ApiV3.decode({:error, "{\\"a\\": 1}", "application/json"})
       {:error, %{a: 1}}
 
-      iex> ExActivecampaign.Api.decode({:ok, "{goop}", "application/json"})
+      iex> ExActivecampaign.ApiV3.decode({:ok, "{goop}", "application/json"})
       {:error, "{goop}"}
 
-      iex> ExActivecampaign.Api.decode({:error, "{goop}", "application/json"})
+      iex> ExActivecampaign.ApiV3.decode({:error, "{goop}", "application/json"})
       {:error, "{goop}"}
 
-      iex> ExActivecampaign.Api.decode({:error, :nxdomain, "application/dontcare"})
+      iex> ExActivecampaign.ApiV3.decode({:error, :nxdomain, "application/dontcare"})
       {:error, :nxdomain}
   """
-  def decode({ok, body, _}) when is_atom(body), do: {ok, body}
-  def decode({ok, "", _}), do: {ok, ""}
+  def decode({status, body, _}) when is_atom(body), do: {status, body}
+  def decode({status, "", _}), do: {status, ""}
 
-  def decode({ok, body, "application/json"}) when is_binary(body) do
+  def decode({status, body, "application/json"}) when is_binary(body) do
     body
     |> Poison.decode(keys: :atoms)
     |> case do
-      {:ok, parsed} -> {ok, parsed}
+      {:ok, parsed} -> {status, parsed}
       _ -> {:error, body}
     end
   end
 
-  def decode({ok, body, "application/xml"}) do
-    case decoded_body = body |> :binary.bin_to_list() |> :xmerl_scan.string() do
-      :exit, _e -> {:error, body}
+  def decode({_status, body, "application/xml"}) do
+    decoded_body = body |> :binary.bin_to_list() |> :xmerl_scan.string()
+
+    case decoded_body do
+      {:exit, _e} -> {:error, body}
       _ -> {:ok, decoded_body}
     end
   end
 
-  def decode({ok, body, _}), do: {ok, body}
+  def decode({status, body, _}), do: {status, body}
 
   @doc """
   Clean the URL, if there is a port, but nothing after, then ensure there's a ending '/' otherwise you will encounter
@@ -171,26 +145,26 @@ defmodule ExActivecampaign.Api do
 
   ## Examples
 
-      iex> ExActivecampaign.Api.clean_url()
-      "http://localhost:8081/"
+      iex> ExActivecampaign.ApiV3.clean_url()
+      "http://localhost:8081/v3"
 
-      iex> ExActivecampaign.Api.clean_url(nil)
-      "http://localhost:8081/"
+      iex> ExActivecampaign.ApiV3.clean_url(nil)
+      "http://localhost:8081/v3"
 
-      iex> ExActivecampaign.Api.clean_url("")
-      "http://localhost:8081/"
+      iex> ExActivecampaign.ApiV3.clean_url("")
+      "http://localhost:8081/v3"
 
-      iex> ExActivecampaign.Api.clean_url("/profile")
-      "http://localhost:8081/profile"
+      iex> ExActivecampaign.ApiV3.clean_url("/profile")
+      "http://localhost:8081/v3/profile"
 
-      iex> ExActivecampaign.Api.clean_url("http://localhost")
+      iex> ExActivecampaign.ApiV3.clean_url("http://localhost")
       "http://localhost"
 
-      iex> ExActivecampaign.Api.clean_url("http://localhost:8081/b")
+      iex> ExActivecampaign.ApiV3.clean_url("http://localhost:8081/b")
       "http://localhost:8081/b"
 
-      iex> ExActivecampaign.Api.clean_url("http://localhost:8081")
-      "http://localhost:8081/"
+      iex> ExActivecampaign.ApiV3.clean_url("http://localhost:8081/v3")
+      "http://localhost:8081/v3"
   """
   def clean_url(url \\ nil) do
     url
@@ -200,9 +174,9 @@ defmodule ExActivecampaign.Api do
 
   defp endpoint_url(endpoint) do
     case endpoint do
-      nil -> base_url()
-      "" -> base_url()
-      "/" <> _ -> base_url() <> endpoint
+      nil -> ExActivecampaign.base_url_v3()
+      "" -> ExActivecampaign.base_url_v3()
+      "/" <> _ -> ExActivecampaign.base_url_v3() <> endpoint
       _ -> endpoint
     end
   end
@@ -223,25 +197,25 @@ defmodule ExActivecampaign.Api do
 
   ## Examples
 
-      iex> ExActivecampaign.Api.clean_headers(%{})
+      iex> ExActivecampaign.ApiV3.clean_headers(%{})
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Content-Type", "application/json; charset=utf-8"}]
 
-      iex> ExActivecampaign.Api.clean_headers(%{"Content-Type" => "application/xml"})
+      iex> ExActivecampaign.ApiV3.clean_headers(%{"Content-Type" => "application/xml"})
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Content-Type", "application/xml"}]
 
-      iex> ExActivecampaign.Api.clean_headers(%{"Authorization" => "Bearer abc123"})
+      iex> ExActivecampaign.ApiV3.clean_headers(%{"Authorization" => "Bearer abc123"})
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Authorization","Bearer abc123"}, {"Content-Type", "application/json; charset=utf-8"}]
 
-      iex> ExActivecampaign.Api.clean_headers(%{"Authorization" => "Bearer abc123", "Content-Type" => "application/xml"})
+      iex> ExActivecampaign.ApiV3.clean_headers(%{"Authorization" => "Bearer abc123", "Content-Type" => "application/xml"})
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Authorization","Bearer abc123"}, {"Content-Type", "application/xml"}]
 
-      iex> ExActivecampaign.Api.clean_headers([])
+      iex> ExActivecampaign.ApiV3.clean_headers([])
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Content-Type", "application/json; charset=utf-8"}]
 
-      iex> ExActivecampaign.Api.clean_headers([{"apples", "delicious"}])
+      iex> ExActivecampaign.ApiV3.clean_headers([{"apples", "delicious"}])
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"Content-Type", "application/json; charset=utf-8"}, {"apples", "delicious"}]
 
-      iex> ExActivecampaign.Api.clean_headers([{"apples", "delicious"}, {"Content-Type", "application/xml"}])
+      iex> ExActivecampaign.ApiV3.clean_headers([{"apples", "delicious"}, {"Content-Type", "application/xml"}])
       [{"Api-Token", "DEFAULT-ACTIVECAMPAIGN-TOKEN"}, {"apples", "delicious"}, {"Content-Type", "application/xml"}]
   """
   def clean_headers(h) when is_map(h) do
@@ -254,8 +228,11 @@ defmodule ExActivecampaign.Api do
     h
     |> Enum.filter(fn {k, _v} -> k == "Content-Type" end)
     |> case do
-      [] -> [{"Api-Token", api_token()}, {"Content-Type", "application/json; charset=utf-8"} | h]
-      _ -> [{"Api-Token", api_token()}] ++ h
+      [] ->
+        Map.to_list(auth_header()) ++ [{"Content-Type", "application/json; charset=utf-8"} | h]
+
+      _ ->
+        Map.to_list(auth_header()) ++ h
     end
   end
 

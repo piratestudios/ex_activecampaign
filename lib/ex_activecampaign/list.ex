@@ -5,7 +5,8 @@ defmodule ExActivecampaign.List do
     see: https://developers.activecampaign.com/reference#lists
   """
 
-  alias ExActivecampaign.Api
+  alias ExActivecampaign
+  alias ExActivecampaign.ApiV3
 
   @doc """
     Retrieves a List from the ActiveCampaign system by their Id or stringId within the ActiveCampaign system
@@ -19,7 +20,7 @@ defmodule ExActivecampaign.List do
       %{error_message: "Not Found"}
   """
   def retrieve(id) do
-    Api.get(Api.base_url() <> "/lists/#{id}", %{}, [])
-    |> Api.handle_response
+    ApiV3.get(ExActivecampaign.base_url_v3() <> "/lists/#{id}", %{}, [])
+    |> ApiV3.handle_response()
   end
 end

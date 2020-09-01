@@ -75,6 +75,35 @@ defmodule ExActivecampaign.Contact do
   end
 
   @doc """
+  Updates an existing Contact on the ActiveCampaign system
+
+    see: https://developers.activecampaign.com/reference#update-a-contact-new
+
+    Expects an ActiveCampaign Contact ID (returned from initial Contact creation and stored in User table) as well as
+    a map of properties to update, such as:
+    ```
+    %{
+      "email" => "johndoe@example.com",
+      "first_name" => "John",
+      "last_name" => "Doe",
+      "phone" => "7223224241"
+    }
+    ```
+
+    ## Examples
+
+      iex> ExActivecampaign.Contact.update(80480, %{"email" => "johndoe@example.com", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
+      %{contact: %{email: "johndoe@example.com", firstName: "John", id: "80480", lastName: "Doe", phone: "7223224241"}}
+
+      iex> ExActivecampaign.Contact.update(80480, %{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
+      %{error_message: "Unprocessable Entity"}
+  """
+  def update(contact_id, params) do
+    ApiV3.post(ExActivecampaign.base_url_v3() <> "/contacts/" <> Integer.to_string(contact_id), params)
+    |> ApiV3.handle_response()
+  end
+
+  @doc """
     Uses v1 of the API to sync a Contact on the ActiveCampaign system, including bulk update of custom field values
 
     see: https://www.activecampaign.com/api/example.php?call=contact_sync

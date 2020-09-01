@@ -101,6 +101,24 @@ defmodule ExActivecampaign.MockServer do
     end
   end
 
+  post "/v3/contacts/80480" do
+    case conn.params do
+      %{"email" => "johndoe@example.com"} ->
+        post_success_created(conn, %{
+          "contact" => %{
+            "id" => "80480",
+            "email" => "johndoe@example.com",
+            "firstName" => "John",
+            "lastName" => "Doe",
+            "phone" => "7223224241"
+          }
+        })
+
+      %{"email" => "1234"} ->
+        post_failure_unprocessable_entity(conn)
+    end
+  end
+
   post "/v3/contactLists" do
     case conn.params do
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => 1}} ->

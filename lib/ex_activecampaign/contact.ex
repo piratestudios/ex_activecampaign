@@ -99,7 +99,10 @@ defmodule ExActivecampaign.Contact do
       %{error_message: "Unprocessable Entity"}
   """
   def update(contact_id, params) do
-    ApiV3.post(ExActivecampaign.base_url_v3() <> "/contacts/" <> Integer.to_string(contact_id), params)
+    ApiV3.post(
+      ExActivecampaign.base_url_v3() <> "/contacts/" <> Integer.to_string(contact_id),
+      params
+    )
     |> ApiV3.handle_response()
   end
 

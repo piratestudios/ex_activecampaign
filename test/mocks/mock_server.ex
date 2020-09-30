@@ -121,7 +121,7 @@ defmodule ExActivecampaign.MockServer do
 
   post "/v3/contactTags" do
     case conn.params do
-      %{"contactTag" => %{"contact" => "80480", "tag"=> "167"}} ->
+      %{"contactTag" => %{"contact" => "80480", "tag" => "167"}} ->
         post_success_created(conn, %{
           "contactTag" => %{
             "cdate" => "2020-09-01T17:25:00-00:00",

@@ -140,8 +140,11 @@ defmodule ExActivecampaign.ApiV3 do
   def decode({status, body, _}), do: {status, body}
 
   @doc """
-  Clean the URL, if there is a port, but nothing after, then ensure there's a ending '/' otherwise you will encounter
-  something like hackney_url.erl:204: :hackney_url.parse_netloc/2
+  Clean the provided URL.
+
+  - if a nil or empty string URL is provided, returns the base endpoint URL for this API version
+  - if the URL starts with a slash, prepend the endpoint URL for this API version
+  - if the URL ends with a port number, ensures there's a ending '/' otherwise you will run into Hackney errors
 
   ## Examples
 
@@ -165,6 +168,9 @@ defmodule ExActivecampaign.ApiV3 do
 
       iex> ExActivecampaign.ApiV3.clean_url("http://localhost:8081/v3")
       "http://localhost:8081/v3"
+
+      iex> ExActivecampaign.ApiV1.clean_url("http://localhost:8081")
+      "http://localhost:8081/"
   """
   def clean_url(url \\ nil) do
     url

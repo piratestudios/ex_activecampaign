@@ -104,6 +104,24 @@ defmodule ExActivecampaign.Contact do
   end
 
   @doc """
+  Adds the Tag identified by tag_id to the Contact identified by contact_id.
+
+    ## Examples
+
+      iex> ExActivecampaign.Contact.tags(80480, 167)
+      %{contactTag: %{cdate: "2020-09-01T17:25:00-00:00", contact: "80480", id: "1", links: %{contact: "/80480/contact", tag: "/167/tag"}, tag: "167"}}
+  """
+  def tags(contact_id, tag_id) do
+    ApiV3.post(ExActivecampaign.base_url_v3() <> "/contactTags", %{
+      "contactTag" => %{
+        "contact" => "#{contact_id}",
+        "tag" => "#{tag_id}"
+      }
+    })
+    |> ApiV3.handle_response()
+  end
+
+  @doc """
     Uses v1 of the API to sync a Contact on the ActiveCampaign system, including bulk update of custom field values
 
     see: https://www.activecampaign.com/api/example.php?call=contact_sync

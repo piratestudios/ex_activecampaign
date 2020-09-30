@@ -40,7 +40,7 @@ defmodule ExActivecampaign.ApiV1 do
 
   ## Examples
 
-      iex> ExActivecampaign.ApiV1.content_type({:ok, %{"email" => "johndoe@example.com"}, [{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}]})
+      iex> ExActivecampaign.ApiV1.content_type({:ok, %{"email" => "johndoe@example.com"}, [{"Content-Type", "application/xml; charset=utf-8"}]})
       {:ok, %{"email" => "johndoe@example.com"}, "application/x-www-form-urlencoded"}
 
       iex> ExActivecampaign.ApiV1.content_type([])
@@ -51,14 +51,10 @@ defmodule ExActivecampaign.ApiV1 do
 
       iex> ExActivecampaign.ApiV1.content_type([{"Content-Type", "application/xml; charset=utf-8"}])
       "application/x-www-form-urlencoded"
-
-      iex> ExActivecampaign.ApiV1.content_type([{"Server", "GitHub.com"}, {"Content-Type", "application/xml; charset=utf-8"}])
-      "application/x-www-form-urlencoded"
   """
   def content_type({status, body, headers}), do: {status, body, content_type(headers)}
   def content_type([]), do: "application/x-www-form-urlencoded"
   def content_type([{"Content-Type", _val} | _]), do: "application/x-www-form-urlencoded"
-  def content_type([_ | tail]), do: tail |> content_type
 
   @doc """
   Encode the body to pass along to the server

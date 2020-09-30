@@ -232,7 +232,9 @@ defmodule ExActivecampaign.ApiV1 do
   def handle_response({status, body} = _resp) do
     case status do
       200 -> body
-      _ -> %{error_message: "Bad Request"}
+      x when x in 400..499 -> %{error_message: "Bad Request"}
+      x when x in 500..599 -> %{error_message: "Internal Server Error"}
+      _ -> %{error_message: "Unknown Error"}
     end
   end
 end

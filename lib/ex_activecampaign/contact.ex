@@ -33,7 +33,7 @@ defmodule ExActivecampaign.Contact do
       %{contact: %{email: "johndoe@example.com", firstName: "John", id: "1", lastName: "Doe", phone: "7223224241"}}
 
       iex> ExActivecampaign.Contact.create(%{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
-      %{error_message: "Unprocessable Entity"}
+      %{error_message: "Bad Request", errors: [%{"title": "Contact Email Address is not valid.", "detail": "", "code": "email_invalid", "error": "must_be_valid_email_address", "source": %{"pointer": "/data/attributes/email"}}]}
 
       iex> ExActivecampaign.Contact.create(%{"phone" => "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create/1
@@ -64,7 +64,7 @@ defmodule ExActivecampaign.Contact do
       %{contact: %{email: "johndoe@example.com", firstName: "John", id: "1", lastName: "Doe", phone: "7223224241"}}
 
       iex> ExActivecampaign.Contact.create_or_update(%{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
-      %{error_message: "Unprocessable Entity"}
+      %{error_message: "Bad Request", errors: [%{"title": "Contact Email Address is not valid.", "detail": "", "code": "email_invalid", "error": "must_be_valid_email_address", "source": %{"pointer": "/data/attributes/email"}}]}
 
       iex> ExActivecampaign.Contact.create_or_update(%{"phone" => "1234"})
       ** (FunctionClauseError) no function clause matching in ExActivecampaign.Contact.create_or_update/1
@@ -96,7 +96,7 @@ defmodule ExActivecampaign.Contact do
       %{contact: %{email: "johndoe@example.com", firstName: "John", id: "80480", lastName: "Doe", phone: "7223224241"}}
 
       iex> ExActivecampaign.Contact.update(80480, %{"email" => "1234", "first_name" => "John", "last_name" => "Doe", "phone" => "7223224241"})
-      %{error_message: "Unprocessable Entity"}
+      %{error_message: "Bad Request", errors: [%{"title": "Contact Email Address is not valid.", "detail": "", "code": "email_invalid", "error": "must_be_valid_email_address", "source": %{"pointer": "/data/attributes/email"}}]}
   """
   def update(contact_id, params) do
     ApiV3.post(
@@ -166,13 +166,13 @@ defmodule ExActivecampaign.Contact do
       %{contact: %{id: "1", email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"}, contactLists: []}
 
       iex> ExActivecampaign.Contact.retrieve(101)
-      %{error_message: "Not Found"}
+      %{error_message: "Bad Request", errors: [%{code: "related_missing", detail: "", error: "contact_not_exist", source: %{pointer: "/data/attributes/contact"}, title: "The related contact does not exist."}]}
 
       iex> ExActivecampaign.Contact.retrieve("johndoe@example.com")
       %{contact: %{id: "1", email: "johndoe@example.com", firstName: "John", lastName: "Doe", phone: "7223224241"}, contactLists: []}
 
       iex> ExActivecampaign.Contact.retrieve("some-invalid-email")
-      %{error_message: "Not Found"}
+      %{error_message: "Bad Request", errors: [%{code: "related_missing", detail: "", error: "contact_not_exist", source: %{pointer: "/data/attributes/contact"}, title: "The related contact does not exist."}]}
   """
   def retrieve(id) when is_integer(id) do
     ApiV3.get(ExActivecampaign.base_url_v3() <> "/contacts/#{id}", %{}, [])
@@ -205,10 +205,13 @@ defmodule ExActivecampaign.Contact do
       %{contactList: %{contact: "1", list: "1", status: 0}, contacts: [%{email: "johndoe@example.com", firstName: "John", id: "1", lastName: "Doe", phone: "7223224241"}]}
 
       iex> ExActivecampaign.Contact.update_list_status(%{contact: "invalid-contact", list: 1, status: 1})
-      %{error_message: "Bad Request"}
+      %{error_message: "Bad Request", errors: [%{code: "related_missing", detail: "", error: "contact_not_exist", source: %{pointer: "/data/attributes/contact"}, title: "The related contact does not exist."}]}
 
       iex> ExActivecampaign.Contact.update_list_status(%{contact: 1, list: "invalid-list", status: 1})
-      %{error_message: "Bad Request"}
+      %{error_message: "Bad Request", errors: [%{title: "The related list does not exist.", detail: "", code: "related_missing", error: "list_not_exist", source: %{pointer: "/data/attributes/list"}}]}
+
+      iex> ExActivecampaign.Contact.update_list_status(%{contact: "invalid-contact", list: "invalid-list", status: 1})
+      %{error_message: "Bad Request", errors: [%{title: "The related list does not exist.", detail: "", code: "related_missing", error: "list_not_exist", source: %{pointer: "/data/attributes/list"}}, %{title: "The related contact does not exist.", detail: "", code: "related_missing", error: "contact_not_exist", source: %{pointer: "/data/attributes/contact"}}]}
 
       iex> ExActivecampaign.Contact.update_list_status(%{contact: 1, list: 1, status: "invalid-status"})
       %{error_message: "Status must be one of: 0 (unconfirmed), 1 (active), 2 (unsubscribed), 3 (active)"}

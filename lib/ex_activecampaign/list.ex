@@ -17,7 +17,7 @@ defmodule ExActivecampaign.List do
       %{list: %{stringid: "example-list", name: "Example List", id: "1"}}
 
       iex> ExActivecampaign.List.retrieve("some-invalid-list-id")
-      %{error_message: "Not Found"}
+      %{error_message: "Bad Request", errors: [%{code: "related_missing", detail: "", error: "list_not_exist", source: %{pointer: "/data/attributes/list"}, title: "The related list does not exist."}]}
   """
   def retrieve(id) do
     ApiV3.get(ExActivecampaign.base_url_v3() <> "/lists/#{id}", %{}, [])

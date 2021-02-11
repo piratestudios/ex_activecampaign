@@ -24,27 +24,17 @@ defmodule ExActivecampaign.MockServer do
     |> Plug.Conn.send_resp(400, Poison.encode!(%{message: "Bad Request"}))
   end
 
-  defp post_failure_unprocessable_entity(conn) do
-    conn
-    |> Plug.Conn.send_resp(422, Poison.encode!(%{message: "Unprocessable Entity"}))
-  end
-
-  defp get_failure_not_found(conn) do
-    conn
-    |> Plug.Conn.send_resp(404, Poison.encode!(%{message: "Not Found"}))
-  end
-
   get "/v3/contacts" do
     case conn.params do
       %{"email" => "johndoe@example.com"} -> contacts_get_success(conn)
-      %{"email" => "some-invalid-email"} -> get_failure_not_found(conn)
+      %{"email" => "some-invalid-email"} -> get_failure_contact_not_found(conn)
     end
   end
 
   get "/v3/contacts/:id" do
     case conn.path_params do
       %{"id" => "1"} -> contacts_get_success(conn)
-      %{"id" => "101"} -> get_failure_not_found(conn)
+      %{"id" => "101"} -> get_failure_contact_not_found(conn)
     end
   end
 
@@ -65,6 +55,26 @@ defmodule ExActivecampaign.MockServer do
     )
   end
 
+  defp get_failure_contact_not_found(conn) do
+    conn
+    |> Plug.Conn.send_resp(
+         404,
+         Poison.encode!(%{
+           errors: [
+             %{
+               title: "The related contact does not exist.",
+               detail: "",
+               code: "related_missing",
+               error: "contact_not_exist",
+               source: %{
+                 pointer: "/data/attributes/contact"
+               }
+             }
+           ]
+         })
+       )
+  end
+
   post "/v3/contacts" do
     case conn.params do
       %{"contact" => %{"email" => "johndoe@example.com"}} ->
@@ -79,8 +89,25 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contact" => %{"email" => "1234"}} ->
-        post_failure_unprocessable_entity(conn)
+        post_failure_email_address_invalid(conn)
     end
+  end
+
+  defp post_failure_email_address_invalid(conn) do
+    conn
+    |> Plug.Conn.send_resp(400, Poison.encode!(%{
+      errors: [
+        %{
+          title: "Contact Email Address is not valid.",
+          detail: "",
+          code: "email_invalid",
+          error: "must_be_valid_email_address",
+          source: %{
+            pointer: "/data/attributes/email"
+          }
+        }
+      ]
+    }))
   end
 
   post "/v3/contact/sync" do
@@ -97,7 +124,7 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contact" => %{"email" => "1234"}} ->
-        post_failure_unprocessable_entity(conn)
+        post_failure_email_address_invalid(conn)
     end
   end
 
@@ -115,7 +142,7 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"email" => "1234"} ->
-        post_failure_unprocessable_entity(conn)
+        post_failure_email_address_invalid(conn)
     end
   end
 
@@ -176,20 +203,83 @@ defmodule ExActivecampaign.MockServer do
         })
 
       %{"contactList" => %{"list" => "invalid-list", "contact" => 1, "status" => 1}} ->
-        post_failure_bad_request(conn)
+        post_failure_bad_request_invalid_list(conn)
 
       %{"contactList" => %{"list" => 1, "contact" => "invalid-contact", "status" => 1}} ->
-        post_failure_bad_request(conn)
+        post_failure_bad_request_invalid_contact(conn)
+
+      %{"contactList" => %{"list" => "invalid-list", "contact" => "invalid-contact", "status" => 1}} ->
+        post_failure_bad_request_invalid_list_and_contact(conn)
 
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => "invalid-status"}} ->
         post_failure_bad_request(conn)
     end
   end
 
+  defp post_failure_bad_request_invalid_list(conn) do
+    conn
+    |> Plug.Conn.send_resp(400, Poison.encode!(%{
+      errors: [
+        %{
+          title: "The related list does not exist.",
+          detail: "",
+          code: "related_missing",
+          error: "list_not_exist",
+          source: %{
+            pointer: "/data/attributes/list"
+          }
+        }
+      ]
+    }))
+  end
+
+  defp post_failure_bad_request_invalid_contact(conn) do
+    conn
+    |> Plug.Conn.send_resp(400, Poison.encode!(%{
+      errors: [
+        %{
+          title: "The related contact does not exist.",
+          detail: "",
+          code: "related_missing",
+          error: "contact_not_exist",
+          source: %{
+            pointer: "/data/attributes/contact"
+          }
+        }
+      ]
+    }))
+  end
+
+  defp post_failure_bad_request_invalid_list_and_contact(conn) do
+    conn
+    |> Plug.Conn.send_resp(400, Poison.encode!(%{
+      errors: [
+        %{
+          title: "The related list does not exist.",
+          detail: "",
+          code: "related_missing",
+          error: "list_not_exist",
+          source: %{
+            pointer: "/data/attributes/list"
+          }
+        },
+        %{
+          title: "The related contact does not exist.",
+          detail: "",
+          code: "related_missing",
+          error: "contact_not_exist",
+          source: %{
+            pointer: "/data/attributes/contact"
+          }
+        }
+      ]
+    }))
+  end
+
   get "/v3/lists/:id" do
     case conn.path_params do
       %{"id" => "1"} -> list_get_success(conn)
-      %{"id" => "some-invalid-list-id"} -> get_failure_not_found(conn)
+      %{"id" => "some-invalid-list-id"} -> get_failure_list_not_found(conn)
     end
   end
 
@@ -205,6 +295,26 @@ defmodule ExActivecampaign.MockServer do
         }
       })
     )
+  end
+
+  defp get_failure_list_not_found(conn) do
+    conn
+    |> Plug.Conn.send_resp(
+         404,
+         Poison.encode!(%{
+           errors: [
+             %{
+               title: "The related list does not exist.",
+               detail: "",
+               code: "related_missing",
+               error: "list_not_exist",
+               source: %{
+                 pointer: "/data/attributes/list"
+               }
+             }
+           ]
+         })
+       )
   end
 
   post "/v1" do

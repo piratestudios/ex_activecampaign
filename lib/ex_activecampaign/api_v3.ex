@@ -247,13 +247,17 @@ defmodule ExActivecampaign.ApiV3 do
 
   def handle_response({status, body} = _resp) do
     case status do
-      200 -> body
-      201 -> body
-      400 -> %{error_message: "Bad Request"}
-      403 -> %{error_message: "Forbidden"}
-      404 -> %{error_message: "Not Found"}
-      422 -> %{error_message: "Unprocessable Entity"}
-      500 -> %{error_message: "Internal Server Error"}
+      x when x in 200..299 ->
+        body
+
+      x when x in 400..499 ->
+        %{error_message: "Bad Request", errors: body.errors}
+
+      x when x in 500..599 ->
+        %{error_message: "Internal Server Error"}
+
+      _ ->
+        %{error_message: "Unknown Error"}
     end
   end
 end

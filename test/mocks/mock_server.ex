@@ -58,21 +58,21 @@ defmodule ExActivecampaign.MockServer do
   defp get_failure_contact_not_found(conn) do
     conn
     |> Plug.Conn.send_resp(
-         404,
-         Poison.encode!(%{
-           errors: [
-             %{
-               title: "The related contact does not exist.",
-               detail: "",
-               code: "related_missing",
-               error: "contact_not_exist",
-               source: %{
-                 pointer: "/data/attributes/contact"
-               }
-             }
-           ]
-         })
-       )
+      404,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "The related contact does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "contact_not_exist",
+            source: %{
+              pointer: "/data/attributes/contact"
+            }
+          }
+        ]
+      })
+    )
   end
 
   post "/v3/contacts" do
@@ -95,19 +95,22 @@ defmodule ExActivecampaign.MockServer do
 
   defp post_failure_email_address_invalid(conn) do
     conn
-    |> Plug.Conn.send_resp(400, Poison.encode!(%{
-      errors: [
-        %{
-          title: "Contact Email Address is not valid.",
-          detail: "",
-          code: "email_invalid",
-          error: "must_be_valid_email_address",
-          source: %{
-            pointer: "/data/attributes/email"
+    |> Plug.Conn.send_resp(
+      400,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "Contact Email Address is not valid.",
+            detail: "",
+            code: "email_invalid",
+            error: "must_be_valid_email_address",
+            source: %{
+              pointer: "/data/attributes/email"
+            }
           }
-        }
-      ]
-    }))
+        ]
+      })
+    )
   end
 
   post "/v3/contact/sync" do
@@ -208,7 +211,13 @@ defmodule ExActivecampaign.MockServer do
       %{"contactList" => %{"list" => 1, "contact" => "invalid-contact", "status" => 1}} ->
         post_failure_bad_request_invalid_contact(conn)
 
-      %{"contactList" => %{"list" => "invalid-list", "contact" => "invalid-contact", "status" => 1}} ->
+      %{
+        "contactList" => %{
+          "list" => "invalid-list",
+          "contact" => "invalid-contact",
+          "status" => 1
+        }
+      } ->
         post_failure_bad_request_invalid_list_and_contact(conn)
 
       %{"contactList" => %{"list" => 1, "contact" => 1, "status" => "invalid-status"}} ->
@@ -218,62 +227,71 @@ defmodule ExActivecampaign.MockServer do
 
   defp post_failure_bad_request_invalid_list(conn) do
     conn
-    |> Plug.Conn.send_resp(400, Poison.encode!(%{
-      errors: [
-        %{
-          title: "The related list does not exist.",
-          detail: "",
-          code: "related_missing",
-          error: "list_not_exist",
-          source: %{
-            pointer: "/data/attributes/list"
+    |> Plug.Conn.send_resp(
+      400,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "The related list does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "list_not_exist",
+            source: %{
+              pointer: "/data/attributes/list"
+            }
           }
-        }
-      ]
-    }))
+        ]
+      })
+    )
   end
 
   defp post_failure_bad_request_invalid_contact(conn) do
     conn
-    |> Plug.Conn.send_resp(400, Poison.encode!(%{
-      errors: [
-        %{
-          title: "The related contact does not exist.",
-          detail: "",
-          code: "related_missing",
-          error: "contact_not_exist",
-          source: %{
-            pointer: "/data/attributes/contact"
+    |> Plug.Conn.send_resp(
+      400,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "The related contact does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "contact_not_exist",
+            source: %{
+              pointer: "/data/attributes/contact"
+            }
           }
-        }
-      ]
-    }))
+        ]
+      })
+    )
   end
 
   defp post_failure_bad_request_invalid_list_and_contact(conn) do
     conn
-    |> Plug.Conn.send_resp(400, Poison.encode!(%{
-      errors: [
-        %{
-          title: "The related list does not exist.",
-          detail: "",
-          code: "related_missing",
-          error: "list_not_exist",
-          source: %{
-            pointer: "/data/attributes/list"
+    |> Plug.Conn.send_resp(
+      400,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "The related list does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "list_not_exist",
+            source: %{
+              pointer: "/data/attributes/list"
+            }
+          },
+          %{
+            title: "The related contact does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "contact_not_exist",
+            source: %{
+              pointer: "/data/attributes/contact"
+            }
           }
-        },
-        %{
-          title: "The related contact does not exist.",
-          detail: "",
-          code: "related_missing",
-          error: "contact_not_exist",
-          source: %{
-            pointer: "/data/attributes/contact"
-          }
-        }
-      ]
-    }))
+        ]
+      })
+    )
   end
 
   get "/v3/lists/:id" do
@@ -300,21 +318,21 @@ defmodule ExActivecampaign.MockServer do
   defp get_failure_list_not_found(conn) do
     conn
     |> Plug.Conn.send_resp(
-         404,
-         Poison.encode!(%{
-           errors: [
-             %{
-               title: "The related list does not exist.",
-               detail: "",
-               code: "related_missing",
-               error: "list_not_exist",
-               source: %{
-                 pointer: "/data/attributes/list"
-               }
-             }
-           ]
-         })
-       )
+      404,
+      Poison.encode!(%{
+        errors: [
+          %{
+            title: "The related list does not exist.",
+            detail: "",
+            code: "related_missing",
+            error: "list_not_exist",
+            source: %{
+              pointer: "/data/attributes/list"
+            }
+          }
+        ]
+      })
+    )
   end
 
   post "/v1" do

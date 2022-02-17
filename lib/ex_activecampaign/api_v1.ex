@@ -239,7 +239,6 @@ defmodule ExActivecampaign.ApiV1 do
   end
 
   def handle_response({_status, body} = _resp) do
-    {error_message: "Expected a map, got #{inspect(body)}"}
-    end
+    %{error_message: "Expected a map, got #{inspect(body)}"}
   end
 end

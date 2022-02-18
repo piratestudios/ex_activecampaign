@@ -229,12 +229,16 @@ defmodule ExActivecampaign.ApiV1 do
   def clean_params(query_params) when query_params == %{}, do: []
   def clean_params(query_params), do: [{:params, query_params}]
 
-  def handle_response({_status, body} = _resp) do
+  def handle_response({_status, body} = _resp) when is_map(body) do
     # V1 of the API always returns a 200 status code, and uses a field in the response to indicate success or failure
     case body["result_code"] do
       0 -> %{error_message: body["result_message"]}
       1 -> body
       _ -> %{error_message: "Unknown Error"}
     end
+  end
+
+  def handle_response({_status, body} = _resp) do
+    %{error_message: "Expected a map, got #{inspect(body)}"}
   end
 end

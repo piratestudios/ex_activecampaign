@@ -251,7 +251,10 @@ defmodule ExActivecampaign.ApiV3 do
         body
 
       x when x in 400..499 ->
-        %{error_message: "Bad Request", errors: body.errors}
+case body do
+  %{errors: _} -> %{error_message: "Bad Request", errors: body.errors}
+  %{error: _} -> %{error_message: "Bad Request", error: body.error}
+end
 
       x when x in 500..599 ->
         %{error_message: "Internal Server Error"}

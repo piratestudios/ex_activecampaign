@@ -31,7 +31,7 @@ defmodule ExActivecampaign.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
-      {:poison, "~> 3.1"},
+      {:poison, "~> 4.0"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:plug_cowboy, "~> 2.3", only: [:test]}
     ]
